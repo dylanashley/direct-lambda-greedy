@@ -1,0 +1,21 @@
+{
+	"folders":
+	[
+		{
+			"file_exclude_patterns":
+			[
+				"*.ipynb",
+				"*.pyc",
+				"*.pyo",
+				"*.sublime-project",
+				".gitignore"
+			],
+			"folder_exclude_patterns":
+			[
+				".ipynb_checkpoints",
+				"__pycache__"
+			],
+			"path": "."
+		}
+	]
+}
