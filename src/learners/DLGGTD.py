@@ -19,7 +19,6 @@ class DLGGTD:
         self.w_var = np.zeros(n)
         self.e_bar = np.zeros(n)
         self.z_bar = np.zeros(n)
-        self._lambda = 1
         self._gamma_bar = initial_gamma
 
     def predict(self, x):
@@ -27,16 +26,17 @@ class DLGGTD:
         return np.dot(self._GTD.w, x)
 
     def update(self, reward, gamma, x, alpha, eta, kappa, rho=1):
-        self._lambda, self._gamma_bar = DLGGTD.lambda_greedy(
+        _lambda, self._gamma_bar = DLGGTD.lambda_greedy(
             self._last_gamma, self._GTD._last_x, reward, gamma, x, rho,
             self.w_err, self.w_var, self._GTD.w, self.e_bar, self.z_bar, alpha,
-            self._lambda, self._gamma_bar, kappa)
-        self._GTD.update(reward, gamma, x, alpha, eta, self._lambda, rho)
+            self._gamma_bar, kappa)
+        self._GTD.update(reward, gamma, x, alpha, eta, _lambda, rho)
+        return _lambda
 
     @staticmethod
     def lambda_greedy(gamma, x, next_reward, next_gamma, next_x, rho, w_err,
-                      w_var, w, last_e_bar, last_z_bar, alpha,
-                      next_lambda_estimate, gamma_bar, kappa_bar):
+                      w_var, w, last_e_bar, last_z_bar, alpha, gamma_bar,
+                      kappa_bar):
         # use GTD to update w_err
         delta_err = next_reward + next_gamma * np.dot(next_x, w_err) - np.dot(
             x, w_err)
@@ -48,7 +48,7 @@ class DLGGTD:
         # use GTD to update w_var
         delta = next_reward + next_gamma * np.dot(next_x, w) - np.dot(x, w)
         next_reward_bar = delta**2
-        next_gamma_bar = (next_gamma * next_lambda_estimate)**2
+        next_gamma_bar = next_gamma**2
         delta_bar = next_reward_bar + next_gamma_bar * np.dot(
             next_x, w_var) - np.dot(x, w_var)
         last_z_bar *= kappa_bar * gamma_bar

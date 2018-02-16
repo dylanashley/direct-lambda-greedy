@@ -14,14 +14,16 @@ from learners import *
 def main(args):
     global siginfo_message
 
-    all_rmse = np.ones((args['num_seeds'], args['num_steps'])) * np.nan
-    all_lambda = np.copy(all_rmse)
+    all_msve = np.ones((args['num_seeds'], args['num_steps'])) * np.nan
+    all_lambda = np.copy(all_msve)
 
     for seed in range(args['num_seeds']):
 
         # build domain
         domain = Ringworld.Ringworld(
-            args['num_states'], random_generator=np.random.RandomState(seed))
+            args['num_states'],
+            left_probability=args['left_probability'],
+            random_generator=np.random.RandomState(seed))
         last_x, action, reward, gamma, x = next(domain)
         last_x = domain.state_to_features(last_x)
         x = domain.state_to_features(x)
@@ -37,11 +39,15 @@ def main(args):
                 seed + 1, args['num_seeds'], step + 1, args['num_steps'], step)
 
             # process step
+            rho = 0.05 / args[
+                'left_probability'] if action == domain.LEFT else 0.95 / (
+                    1 - args['left_probability'])
             lambda_ = learner.update(reward, gamma, x, args['alpha'],
-                                     args['eta'], args['kappa'])
+                                     args['eta'], rho)
 
-            # record rmse and lambda
-            all_rmse[seed, step] = domain.rmse(learner)
+            # record msve and lambda
+            all_msve[seed, step] = domain.msve(
+                learner, left_probability=args['left_probability'])
             all_lambda[seed, step] = lambda_
 
             # move to next step
@@ -49,9 +55,9 @@ def main(args):
             last_x = domain.state_to_features(last_x)
             x = domain.state_to_features(x)
 
-    with open('{}/rmse.npz'.format(args['directory']), 'wb') as outfile:
-        np.save(outfile, all_rmse)
-    with open('{}/lambda.npz'.format(args['directory']), 'wb') as outfile:
+    with open('{}/msve.npy'.format(args['directory']), 'wb') as outfile:
+        np.save(outfile, all_msve)
+    with open('{}/lambda.npy'.format(args['directory']), 'wb') as outfile:
         np.save(outfile, all_lambda)
 
 
@@ -60,7 +66,8 @@ def parse_args():
     parser.add_argument('directory')
     parser.add_argument('alpha', type=float)
     parser.add_argument('eta', type=float)
-    parser.add_argument('kappa', type=float)
+    parser.add_argument(
+        '--leftprob', type=float, dest='left_probability', default=0.05)
     parser.add_argument('--numseeds', type=int, dest='num_seeds', default=100)
     parser.add_argument('--numstates', type=int, dest='num_states', default=25)
     parser.add_argument('--numsteps', type=int, dest='num_steps')
@@ -87,8 +94,8 @@ if __name__ == '__main__':
         )
 
     # parse args and run
-    rmse_filename = '{}/rmse.npz'.format(args['directory'])
-    lambda_filename = '{}/lambda.npz'.format(args['directory'])
-    if not (os.path.exists(rmse_filename) and
+    msve_filename = '{}/msve.npy'.format(args['directory'])
+    lambda_filename = '{}/lambda.npy'.format(args['directory'])
+    if not (os.path.exists(msve_filename) and
             (os.path.exists(lambda_filename))):
         main(args)

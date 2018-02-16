@@ -24,101 +24,102 @@ def main(args):
         kappa_values = np.array([float(line.strip()) for line in infile])
 
     # load data
-    GTD_rmse = np.ones((len(alpha_values), len(eta_values), len(lambda_values),
+    GTD_msve = np.ones((len(alpha_values), len(eta_values), len(lambda_values),
                         args['num_seeds'], args['num_steps'])) * np.nan
-    GTD_lambda = np.copy(GTD_rmse)
-    LGGTD_rmse = np.ones((len(alpha_values), len(eta_values),
+    GTD_lambda = np.copy(GTD_msve)
+    LGGTD_msve = np.ones((len(alpha_values), len(eta_values),
                           args['num_seeds'], args['num_steps'])) * np.nan
-    LGGTD_lambda = np.copy(LGGTD_rmse)
-    DLGGTD_rmse = np.ones(
+    LGGTD_lambda = np.copy(LGGTD_msve)
+    DLGGTD_msve = np.ones(
         (len(alpha_values), len(eta_values), len(kappa_values),
          args['num_seeds'], args['num_steps'])) * np.nan
-    DLGGTD_lambda = np.copy(DLGGTD_rmse)
+    DLGGTD_lambda = np.copy(DLGGTD_msve)
     for alpha_index, alpha_value in enumerate(alpha_values):
         for eta_index, eta_value in enumerate(eta_values):
 
             # load GTD data
             for lambda_index, lambda_value in enumerate(lambda_values):
-                directory = '{}/{}/GTD/{}/{}/{}'.format(
-                    args['directory'], args['num_states'], alpha_value,
-                    eta_value, lambda_value)
-                all_rmse = None
+                directory = '{}/{}/{}/GTD/{}/{}/{}'.format(
+                    args['directory'], args['left_probability'],
+                    args['num_states'], alpha_value, eta_value, lambda_value)
+                all_msve = None
                 all_lambda = None
                 try:
-                    with open('{}/rmse.npz'.format(directory), 'rb') as infile:
-                        all_rmse = np.load(infile)
+                    with open('{}/msve.npy'.format(directory), 'rb') as infile:
+                        all_msve = np.load(infile)
                 except FileNotFoundError:
                     pass
                 try:
-                    with open('{}/lambda.npz'.format(directory),
+                    with open('{}/lambda.npy'.format(directory),
                               'rb') as infile:
                         all_lambda = np.load(infile)
                 except FileNotFoundError:
                     pass
-                if (all_rmse is not None) and (all_lambda is not None):
+                if (all_msve is not None) and (all_lambda is not None):
                     np.copyto(
-                        GTD_rmse[alpha_index, eta_index, lambda_index, ...],
-                        all_rmse)
+                        GTD_msve[alpha_index, eta_index, lambda_index, ...],
+                        all_msve)
                     np.copyto(
                         GTD_lambda[alpha_index, eta_index, lambda_index, ...],
                         all_lambda)
 
             # load LGGTD data
-            directory = '{}/{}/LGGTD/{}/{}'.format(
-                args['directory'], args['num_states'], alpha_value, eta_value)
-            all_rmse = None
+            directory = '{}/{}/{}/LGGTD/{}/{}'.format(
+                args['directory'], args['left_probability'],
+                args['num_states'], alpha_value, eta_value)
+            all_msve = None
             all_lambda = None
             try:
-                with open('{}/rmse.npz'.format(directory), 'rb') as infile:
-                    all_rmse = np.load(infile)
+                with open('{}/msve.npy'.format(directory), 'rb') as infile:
+                    all_msve = np.load(infile)
             except FileNotFoundError:
                 pass
             try:
-                with open('{}/lambda.npz'.format(directory), 'rb') as infile:
+                with open('{}/lambda.npy'.format(directory), 'rb') as infile:
                     all_lambda = np.load(infile)
             except FileNotFoundError:
                 pass
-            if (all_rmse is not None) and (all_lambda is not None):
-                np.copyto(LGGTD_rmse[alpha_index, eta_index, ...], all_rmse)
+            if (all_msve is not None) and (all_lambda is not None):
+                np.copyto(LGGTD_msve[alpha_index, eta_index, ...], all_msve)
                 np.copyto(LGGTD_lambda[alpha_index, eta_index, ...],
                           all_lambda)
 
             # load DLGGTD data
             for kappa_index, kappa_value in enumerate(kappa_values):
-                directory = '{}/{}/DLGGTD/{}/{}/{}'.format(
-                    args['directory'], args['num_states'], alpha_value,
-                    eta_value, kappa_value)
-                all_rmse = None
+                directory = '{}/{}/{}/DLGGTD/{}/{}/{}'.format(
+                    args['directory'], args['left_probability'],
+                    args['num_states'], alpha_value, eta_value, kappa_value)
+                all_msve = None
                 all_lambda = None
                 try:
-                    with open('{}/rmse.npz'.format(directory), 'rb') as infile:
-                        all_rmse = np.load(infile)
+                    with open('{}/msve.npy'.format(directory), 'rb') as infile:
+                        all_msve = np.load(infile)
                 except FileNotFoundError:
                     pass
                 try:
-                    with open('{}/lambda.npz'.format(directory),
+                    with open('{}/lambda.npy'.format(directory),
                               'rb') as infile:
                         all_lambda = np.load(infile)
                 except FileNotFoundError:
                     pass
-                if (all_rmse is not None) and (all_lambda is not None):
+                if (all_msve is not None) and (all_lambda is not None):
                     np.copyto(
-                        DLGGTD_rmse[alpha_index, eta_index, lambda_index, ...],
-                        all_rmse)
+                        DLGGTD_msve[alpha_index, eta_index, lambda_index, ...],
+                        all_msve)
                     np.copyto(DLGGTD_lambda[alpha_index, eta_index,
                                             lambda_index, ...], all_lambda)
 
     # derive stats from data
-    GTD_mean_msve = np.nanmean(GTD_rmse**2, axis=3)
-    GTD_sem_msve = st.sem(GTD_rmse**2, axis=3, nan_policy='omit')
+    GTD_mean_msve = np.nanmean(GTD_msve**2, axis=3)
+    GTD_sem_msve = st.sem(GTD_msve**2, axis=3, nan_policy='omit')
     GTD_mean_lambda = np.nanmean(GTD_lambda, axis=3)
     GTD_sem_lambda = st.sem(GTD_lambda, axis=3, nan_policy='omit')
-    LGGTD_mean_msve = np.nanmean(LGGTD_rmse**2, axis=2)
-    LGGTD_sem_msve = st.sem(LGGTD_rmse**2, axis=2, nan_policy='omit')
+    LGGTD_mean_msve = np.nanmean(LGGTD_msve**2, axis=2)
+    LGGTD_sem_msve = st.sem(LGGTD_msve**2, axis=2, nan_policy='omit')
     LGGTD_mean_lambda = np.nanmean(LGGTD_lambda, axis=2)
     LGGTD_sem_lambda = st.sem(LGGTD_lambda, axis=2, nan_policy='omit')
-    DLGGTD_mean_msve = np.nanmean(DLGGTD_rmse**2, axis=3)
-    DLGGTD_sem_msve = st.sem(DLGGTD_rmse**2, axis=3, nan_policy='omit')
+    DLGGTD_mean_msve = np.nanmean(DLGGTD_msve**2, axis=3)
+    DLGGTD_sem_msve = st.sem(DLGGTD_msve**2, axis=3, nan_policy='omit')
     DLGGTD_mean_lambda = np.nanmean(DLGGTD_lambda, axis=3)
     DLGGTD_sem_lambda = st.sem(DLGGTD_lambda, axis=3, nan_policy='omit')
 
@@ -246,7 +247,9 @@ def main(args):
     ax2.set_ylabel('Lambda', fontsize=FONTSIZE, labelpad=10)
     ax2.set_yticks(np.array([0.2 * i for i in range(6)]))
     fig.suptitle(
-        '{}-State Ringworld'.format(args['num_states']), fontsize=FONTSIZE)
+        '{}-State Ringworld with mu(s, left) = {}'.format(
+            args['num_states'], args['left_probability']),
+        fontsize=FONTSIZE)
     fig.subplots_adjust(hspace=0.25)
     ax1.legend(loc='best', frameon=False)
 
@@ -262,6 +265,8 @@ def parse_args():
     parser.add_argument('num_seeds', type=int)
     parser.add_argument('num_states', type=int)
     parser.add_argument('num_steps', type=int)
+    parser.add_argument(
+        '--leftprob', type=float, dest='left_probability', default=0.05)
     parser.add_argument('--alpha-values', type=str, default='alpha_values.txt')
     parser.add_argument('--eta-values', type=str, default='eta_values.txt')
     parser.add_argument(
