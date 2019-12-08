@@ -1,0 +1,215 @@
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+
+We experiment with the ability of {$\lambda$}-greedy (LGGTD), direct {$\lambda$}-greedy (DLGGTD), and GTD to learn the horde described in Section~\ref{sec:value_functions}. For all of our experiments we use a step size of $\alpha = 0.005$ (i.e., $\alpha = \frac{0.01}{\lVert x \rVert}$). We find that this provides a good balance between learning rate and smoothness of the learning curves. Notable it can learn most of the value functions adequately in 2500 timesteps while producing adequately smooth learning curves. We use a one-second timestep which is more than sufficient for the time it takes to update the learning sub-agents. Figure~\ref{fig:processing_time} shows the amount of time taken to update all of the sub-agents in one representative run. A single run of 2500 timesteps takes approximately forty-five minutes. Hence we only report results from ten runs. We find that ten runs adequately captures all our observations from earlier experiments. We use the word \textit{Average} to describe an average value over the ten runs and omit it when we discuss a single run.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\linewidth]{{processing_time.png}}
+    \caption{Time Taken to Update All Sub-agents Over One Run}
+    \label{fig:processing_time}
+\end{figure}
+
+On each of our runs, we use an auxiliary step-size of $\eta = 0.01$ as this is both a value that frequently performs well \cite{white2015developing}, and because it produces results consistent with other values of $\eta$ we tried. We use the same value of $\alpha$ and $\eta$ for all of the algorithms we compare. For LGGTD and DLGGTD we use the same step size throughout the algorithm. For GTD we only consider the cases where $\lambda$ is either one or zero as these were the values {$\lambda$}-greedy was previously compared against in the original paper by \citep{white2016greedy}.
+
+When we compare the algorithms, we frequently use a weighted average over value functions. In this cases, we weight the corresponding value for each value function by the inverse of its maximum return. As some of these values are infinite, we discuss in detail how we approximate these values in Section~\ref{sec:value_functions}. Similarly, we frequently use a true error metric for value functions. As mentioned in Section~\ref{sec:value_functions}, we are only able to calculate a true error metric for all value functions pertaining to the angle. Therefore we exclude any value functions pertaining to the load from these calculations.
+
+We divide our analysis into a few sections. We begin by discussing the kind of signals coming from the robot in Section~\ref{sec:observed_behaviour}. Afterward, in Section~\ref{sec:overall_performance}, we discuss the overall performance of the algorithms. Then, in Section~\ref{sec:value_functions_performance}, we discuss important details regarding the performance of the algorithms on individual value functions. Finally, in Section~\ref{sec:lambda_performance}, we discuss how the selected values for $\lambda$ differ between LGGTD and DLGGTD.
+
+\subsection{Observed Behaviour}
+\label{sec:observed_behaviour}
+
+As the behavior policy is a random walk, there is considerable variability in the angle and load observed. Figure~\ref{fig:observed_angle} shows the representative angle values observed in the first four hundred steps of one run, and Figure~\ref{fig:observed_load} shows the corresponding load values. Note that the angle readings clusters reasonably smoothly around the four encoder positions described in Section~\ref{sec:domain} while the load is a much noisier signal.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\linewidth]{{observed_angle.png}}
+    \caption{Observed Angle Values Over One Run}
+    \label{fig:observed_angle}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\linewidth]{{observed_load.png}}
+    \caption{Observed Load Values Over One Run}
+    \label{fig:observed_load}
+\end{figure}
+
+\subsection{Overall Performance}
+\label{sec:overall_performance}
+
+We report the weighted average of the true error for each of the learners in Figure~\ref{fig:average_weighted_mean_true_error}. Note that these values are an average of ten runs and most individual runs appear as slightly noisier variants of the result shown here. These results are consistent with earlier experiments.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\linewidth]{{average_weighted_mean_true_error.png}}
+    \caption{Average Weighted True Error}
+    \label{fig:average_weighted_mean_true_error}
+\end{figure}
+
+The most notable takeaway from Figure~\ref{fig:average_weighted_mean_true_error} is that LGGTD performs similarly to GTD(1) but is more stable. The main reason for this is that GTD(1) encounters some issues with some instability when learning a few of the value functions. However, as shown in Figure~\ref{fig:weighted_mean_true_error}, in runs where GTD(1) does not encounter these issues we observe that LGGTD typically matches or outperforms GTD(1). We acknowledge that this instability may be resolved by additional parameter tuning, but we believe the analysis of this instability in this context provides an interesting view into the stability of the algorithms.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\linewidth]{{weighted_mean_true_error.png}}
+    \caption{Weighted True Error Experienced in One Run}
+    \label{fig:weighted_mean_true_error}
+\end{figure}
+
+Another interesting observation from Figure~\ref{fig:average_weighted_mean_true_error} is that DLGGTD performs considerably worse than LGGTD. As discussed later in Section~\ref{sec:lambda_performance} this appears to be due to the $\lambda$ values selected by DLGGTD. However, as shown in Figure~\ref{fig:average_weighted_mean_rupee}, when we observe the RUPEE values \cite{white2015developing} experienced by the learners we note that DLGGTD typically appears below LGGTD. While we conjectured that this inconsistency with our expectations from Figure~\ref{fig:average_weighted_mean_true_error} is due to the performance on value functions relating to the load, this does not appear to be the case. Figure~\ref{fig:average_LGGTD_rupee_load} shows the average RUPEE values experienced by LGGTD for value functions related to the load and Figure~\ref{fig:average_DLGGTD_rupee_load} shows the same values for DLGGTD. Note that both algorithms experience similar values, but LGGTD experiences these values with a higher variance. This observation is consistent with our hypothesis that DLGGTD is more stable than LGGTD but at the cost of lower performance.
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.8\linewidth]{{average_weighted_mean_rupee.png}}
+    \caption{Average Weighted RUPEE}
+    \label{fig:average_weighted_mean_rupee}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.8\linewidth]{{average_LGGTD_rupee_load.png}}
+    \caption{Average RUPEE Experienced by LGGTD for Value Functions Relating to the Load}
+    \label{fig:average_LGGTD_rupee_load}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.8\linewidth]{{average_DLGGTD_rupee_load.png}}
+    \caption{Average RUPEE Experienced by DLGGTD for Value Functions Relating to the Load}
+    \label{fig:average_DLGGTD_rupee_load}
+\end{figure}
+
+\subsection{Performance Over Individual Value Functions}
+\label{sec:value_functions_performance}
+
+Figures \ref{fig:average_GTD_zero_predictions} through \ref{fig:average_DLGGTD_predictions} show the predictions made by each algorithm for each of the value functions. Note that, as observed in Section~\ref{sec:overall_performance}, few substantial differences are observed between LGGTD and GTD(1), DLGGTD performs slightly worse than LGGTD, and GTD(0) performs substantially worse than all of the other algorithms. This difference in performance is most visible in the 8-Step Leg 1 Distance value function. We furthermore note that in Figure~\ref{fig:average_GTD_one_predictions} the prediction for the Fastest Leg 1 Perpendicular value function appears to become unstable later in learning.
+
+We highlight the apparent instability in the Fastest Leg 1 Perpendicular value function in Figure~\ref{fig:average_GTD_one_predictions_fastest}. We observed that this instability only occurs in some runs. We also observed that this is sometimes experienced by the other algorithms but is significantly rarer and, when it does occur, is typically much less severe. An example of this occurring in a run with LGGTD is shown in Figure~\ref{fig:LGGTD_predictions_fastest}. We further observed that, from earlier experiments not shown here, the only other value function that appears to exhibit this behavior is the Fastest Leg 1 Parallel. We argue that this apparent instability is because these value functions are off-policy and that the expected time before the random walk reaches a point where both legs are either parallel or perpendicular to the robot's body is considerable. We elaborate more on this instability in Section~\ref{sec:lambda_performance}.
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.8\linewidth]{{average_GTD_zero_predictions.png}}
+    \caption{Average Estimates Made by GTD(0) for the Value of the Current State}
+    \label{fig:average_GTD_zero_predictions}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.8\linewidth]{{average_GTD_one_predictions.png}}
+    \caption{Average Estimates Made by GTD(1) for the Value of the Current State}
+    \label{fig:average_GTD_one_predictions}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.8\linewidth]{{average_LGGTD_predictions.png}}
+    \caption{Average Estimates Made by LGGTD for the Value of the Current State}
+    \label{fig:average_LGGTD_predictions}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.8\linewidth]{{average_DLGGTD_predictions.png}}
+    \caption{Average Estimates Made by DLGGTD for the Value of the Current State}
+    \label{fig:average_DLGGTD_predictions}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.75\linewidth]{{average_GTD_one_predictions_fastest.png}}
+    \caption{Average Estimates Made by GTD(1) for the Value of the Current State Under the Fastest Leg 1 Parallel and Fastest Leg 1 Perpendicular Value Functions}
+    \label{fig:average_GTD_one_predictions_fastest}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.75\linewidth]{{LGGTD_predictions_fastest.png}}
+    \caption{Estimates Made by LGGTD for the Value of the Current State Under the Fastest Leg 1 Parallel and Fastest Leg 1 Perpendicular Value Functions in One Run}
+    \label{fig:LGGTD_predictions_fastest}
+\end{figure}
+
+\subsection{{$\lambda$} Values Selected}
+\label{sec:lambda_performance}
+
+Both LGGTD and DLGGTD adaptively select a value for $\lambda$ at each timestep. Notably, both methods successfully rid the user of having to tune $\lambda$ by hand. In Section~\ref{sec:overall_performance} we observed that LGGTD performed similarly to GTD(1), DLGGTD performed slightly worse, and GTD(0) performed much worse. As all algorithms only differ by the value of $\lambda$ used, we can conclude that the difference in performance is due to the values of $\lambda$ used by each algorithm. As GTD(0) was significantly outperformed by GTD(1), and DLGGTD was somewhat outperformed by LGGTD, we can conjecture that DLGGTD must be selecting lower values of $\lambda$ than LGGTD. This hypothesis is confirmed by Figure~\ref{fig:average_mean_lambda}. Figure~\ref{fig:average_mean_lambda} shows the average values for $\lambda$ selected by the two algorithms over all the value functions in the ten runs. Notably, the values selected by DLGGTD are generally both smaller and lower in variance than those selected by LGGTD. Figure~\ref{fig:mean_lambda} shows the mean values selected for $\lambda$ in one run over all the value functions. Note the much higher variance exhibited by LGGTD when selecting values for $\lambda$.
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.8\linewidth]{{average_mean_lambda.png}}
+    \caption{Average Values of $\lambda$ Selected by LGGTD and DLGGTD}
+    \label{fig:average_mean_lambda}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.8\linewidth]{{mean_lambda.png}}
+    \caption{Values of $\lambda$ Selected by LGGTD and DLGGTD in One Run}
+    \label{fig:mean_lambda}
+\end{figure}
+
+The trend that DLGGTD selects lower values for $\lambda$ than LGGTD carries over to when we consider the values of $\lambda$ selected for individual value functions. Figures \ref{fig:average_LGGTD_lambda_no_fastest} and \ref{fig:average_LGGTD_lambda_fastest} show the values of $\lambda$ selected by LGGTD for each of the value functions and Figures \ref{fig:average_DLGGTD_lambda_no_fastest} and \ref{fig:average_DLGGTD_lambda_fastest} shown the same for DLGGTD. We separate the values selected for the Fastest Leg 1 Parallel and Fastest Leg 1 Perpendicular value functions with the rest to make the difference between the rest of the value functions more visible.
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.75\linewidth]{{average_LGGTD_lambda_no_fastest.png}}
+    \caption{Average Values of $\lambda$ Selected by LGGTD at Each Timestep}
+    \label{fig:average_LGGTD_lambda_no_fastest}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.75\linewidth]{{average_LGGTD_lambda_fastest.png}}
+    \caption{Average Values of $\lambda$ Selected by LGGTD at Each Timestep for the Fastest Leg 1 Parallel and Fastest Leg 1 Perpendicular Value Functions}
+    \label{fig:average_LGGTD_lambda_fastest}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.75\linewidth]{{average_DLGGTD_lambda_no_fastest.png}}
+    \caption{Average Values of $\lambda$ Selected by DLGGTD at Each Timestep}
+    \label{fig:average_DLGGTD_lambda_no_fastest}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.75\linewidth]{{average_DLGGTD_lambda_fastest.png}}
+    \caption{Average Values of $\lambda$ Selected by DLGGTD at Each Timestep for the Fastest Leg 1 Parallel and Fastest Leg 1 Perpendicular Value Functions}
+    \label{fig:average_DLGGTD_lambda_fastest}
+\end{figure}
+
+Ignoring the Fastest Leg 1 Parallel and Fastest Leg 1 Perpendicular value functions, we note that the behavior of the values of $\lambda$ selected by both algorithms can be subdivided into two parts each. For LGGTD there is first a phase where $\lambda$ is usually one. This phase it is followed by a period where the values of $\lambda$ selected become rapidly fluctuate with a general trend that these values decrease somewhat over time. This trend is consistent with Figure~\ref{fig:average_mean_lambda}. For DLGGTD we note that there is a phase where the values of $\lambda$ selected smoothly decay towards zero. This phase is followed by a period where the values selected for $\lambda$ begin to fluctuate wildly in a similar fashion to the second phase we observed with LGGTD. This behavior is again consistent with Figure~\ref{fig:average_mean_lambda}. Of crucial importance is that the first phase experienced by LGGTD seems to last for a much shorter period than the first phase experienced by DLGGTD. Furthermore, as shown by Figure~\ref{fig:average_weighted_mean_true_error}, the end of the first phase experienced by DLGGTD seems to roughly coincide with the predictions beginning to stabilize close to their final value. Altogether this explains the difference in performances observed between the algorithms in Section~\ref{sec:overall_performance}.
+
+In Section~\ref{sec:value_functions_performance} we noted that there was strange behaviour related to the Fastest Leg 1 Parallel and Fastest Leg 1 Perpendicular value functions. Figures \ref{fig:average_LGGTD_lambda_fastest} and \ref{fig:average_DLGGTD_lambda_fastest} show the values of $\lambda$ selected by LGGTD and DLGGTD respectively for these value functions. Note that here little difference is observed between the two methods.
+
+The similarity of LGGTD and DLGGTD when learning the Fastest Leg 1 Parallel and Fastest Leg 1 Perpendicular value functions and the dissimilarity of them when learning the other value functions is further highlighted when we consider one run. Figures \ref{fig:LGGTD_lambda_no_fastest} and \ref{fig:LGGTD_lambda_fastest} show the values selected by LGGTD for $\lambda$ with each of the value functions during a single run and Figures \ref{fig:DLGGTD_lambda_no_fastest} and \ref{fig:DLGGTD_lambda_fastest} shown the same for DLGGTD. Here we observe two interesting details. The first is that the values selected for $\lambda$ by LGGTD tend to fluctuate between zero and one from one timestep to the next. This behavior is common over value functions. On the other hand, DLGGTD only exhibits this behavior, at least early on, with the Fastest Leg 1 Parallel and Fastest Leg 1 Perpendicular value functions. However, it does adopt this behavior later on as well. This behavior is roughly bounded by the two phases of $\lambda$ selection noted earlier.
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.75\linewidth]{{LGGTD_lambda_no_fastest.png}}
+    \caption{Values of $\lambda$ Selected by LGGTD at Each Timestep in One Run}
+    \label{fig:LGGTD_lambda_no_fastest}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.75\linewidth]{{LGGTD_lambda_fastest.png}}
+    \caption{Values of $\lambda$ Selected by LGGTD at Each Timestep for the Fastest Leg 1 Parallel and Fastest Leg 1 Perpendicular Value Functions in One Run}
+    \label{fig:LGGTD_lambda_fastest}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.75\linewidth]{{DLGGTD_lambda_no_fastest.png}}
+    \caption{Values of $\lambda$ Selected by DLGGTD at Each Timestep in One Run}
+    \label{fig:DLGGTD_lambda_no_fastest}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.75\linewidth]{{DLGGTD_lambda_fastest.png}}
+    \caption{Values of $\lambda$ Selected by DLGGTD at Each Timestep for the Fastest Leg 1 Parallel and Fastest Leg 1 Perpendicular Value Functions in One Run}
+    \label{fig:DLGGTD_lambda_fastest}
+\end{figure}
+
+\end{document}

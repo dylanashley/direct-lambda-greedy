@@ -1,0 +1,81 @@
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+
+We describe how we assemble and power the robot in two parts. In Section~\ref{sec:assembling_the_robot} we describe how we build the robot's body and wire it. Then in Section~\ref{sec:powering_the_robot} we describe the procedure for connecting the robot to a computer that we must follow each time this is done.
+
+\subsection{Assembling the Robot}
+\label{sec:assembling_the_robot}
+
+We begin by wiring the servo motors. We use two ROBOTIS AX-12 servos, a 2.1mm Barrel Jack to terminal from DFRobot (model number RB-Dfr-182), and three ROBOTIS 3-Pin Signal-Power-Ground 200mm cables. We remove the signal cable from one of the 3-Pin cables and the power cable from another one. To wire the servos together, we first connect a power and ground cable to the adapter for the power supply. We connect this to a servo motor. Next, we connect a ground and data cable to the other servo motor to create a communication cable. Finally, we connect a power, ground, and data cable between the motors. When complete, the robot looks like the robot in Figure~\ref{fig:first_stage}. Once the servo motors are wired together, we build the body of the robot.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[height=5cm,angle=90]{{IMG_0812.jpg}}
+    \caption{Wired Servo Motors}
+    \label{fig:first_stage}
+\end{figure}
+
+When building the body of the robot, we use four ROBOTIS OF-12SH frames, two ROBOTIS OF-12H frames, two ROBOTIS BPF-WA/BU Sets, two ROBOTIS Bolt PHS M3*10, sixteen ROBOTIS Bolt PHS M2*6, and eight ROBOTIS N1 NUT M2. We begin by connecting the two servos using the OF-12H frames as shown in Figure~\ref{fig:second_stage}. Note how one servo motor is inverted and how the wires are fed through space in between the bases of the servo motors.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[height=5cm,angle=90]{{IMG_0813.jpg}}
+    \caption{Connected Servo Motors}
+    \label{fig:second_stage}
+\end{figure}
+
+Now that the servo motors are connected, we attach a weight to the back of the robot. We select a weight of about 100 grams. After attaching the weight, the robot appears similar to the robot shown in Figure~\ref{fig:third_stage}. Now that the weight is connected to the robot we construct and attach the legs of the robot.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[height=5cm,angle=90]{{IMG_0816.jpg}}
+    \caption{Connected Servo Motors with Weight}
+    \label{fig:third_stage}
+\end{figure}
+
+ We build the legs by screwing together the OF-12SH frames into two "H" frames as shown in Figure~\ref{fig:fourth_stage_angle}. We place some electrical tape on two tips of each of the H frames as shown in Figure~\ref{fig:fourth_stage_angle}. This tape provides friction to help the robot move. After placing the electrical tape onto the H frames, we connect one to each servo as shown in Figure~\ref{fig:fourth_stage}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[height=5cm,angle=90]{{IMG_0818.jpg}}
+    \caption{H Frames on Fully Constructed Robot}
+    \label{fig:fourth_stage_angle}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[height=5cm,angle=90]{{IMG_0817.jpg}}
+    \caption{Fully Constructed Robot}
+    \label{fig:fourth_stage}
+\end{figure}
+
+\subsection{Powering the Robot}
+\label{sec:powering_the_robot}
+
+To power the robot and connect it to a computer we use a ROBOTIS USB to dynamixel adapter and a RoHS switching power supply (model number FY1203000). We begin by connecting the USB to dynamixel adapter to a computer as shown in Figure~\ref{fig:first_stage_of_powering}. Afterward, we connect the power supply adapter to the power supply as shown in Figure~\ref{fig:second_stage_of_powering}. We ensure the power supply is connected to an outlet. Finally, we connect the communication cable to the USB to dynamixel adapter as shown in Figure~\ref{fig:third_stage_of_powering}.
+
+To detach the robot from the computer, we simply follow the above procedure in reverse order.
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=5cm]{{IMG_0819.jpg}}
+    \caption{First Stage of Powering the Robot}
+    \label{fig:first_stage_of_powering}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=5cm]{{IMG_0820.jpg}}
+    \caption{Second Stage of Powering the Robot}
+    \label{fig:second_stage_of_powering}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=5cm]{{IMG_0821.jpg}}
+    \caption{Third Stage of Powering the Robot}
+    \label{fig:third_stage_of_powering}
+\end{figure}
+
+\end{document}

@@ -1,0 +1,26 @@
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+
+We now describe an abstract interpretation of the domain we define our general value functions on. To do so, we begin by defining a set of 4 states for each servo motor. We label these states $Parallel$, $MoreParallel$, $MorePerpendicular$, and $Perpendicular$. These four states represent four different positionings of the legs of the robot. Here $Parallel$ implies the leg is roughly parallel with the robot's body, $Perpendicular$ implies the leg is roughly perpendicular to the robot's body, and the other two states represent intermediate values. For each state we assign an encoder value as follows:
+
+\begin{center}
+    \begin{tabular}{|l|c|}
+        \hline
+        State & Encoder \\
+        \hline
+        $Parallel$ & 585 \\
+        $MoreParallel$ & 653 \\
+        $MorePerpendicular$ & 722 \\
+        $Perpendicular$ & 790 \\
+        \hline
+    \end{tabular}
+\end{center}
+
+We say that a leg is in a given state if the encoder position the leg is closer to the encoder position of that state than any of the other states. When moving a servo motor to a state, we issue it a move command targetting the encoder value of that state. Because of error in the servo motors, it may not report the exact encoder value of the state after it has moved to it. By using these goalpost values rather than simply moving the servos a set distance, we minimize the interaction of this error with our learning. Now that we have elaborated on how the abstract states for each servo motor are defined we now describe how interaction with the robot occurs in the abstract interpretation of our domain.
+
+At each timestep, for each servo motor, the acting agent has up to 3 possible actions. In the $Parallel$ state the agent can either keep the servo motor in the $Parallel$ state or move the servo motor forwards to the $MoreParallel$ state. In the $MoreParallel$ state the agent can either move the servo motor back to the $Parallel$ state, keep the servo motor in the $MoreParallel$ state, or move the servo motor forwards to the $MorePerpendicular$ state. In the $MorePerpendicular$ state the agent can either move the servo motor back to the $MoreParallel$ state, keep the servo motor in the $MorePerpendicular$ state, or move the servo motor forwards to the $Perpendicular$ state. In the $Perpendicular$ state the agent can either move the servo motor back to the $MorePerpendicular$ state or keep the servo motor in the $Perpendicular$ state.
+
+With both servo motors having 4 states and up to 3 actions in each of these states, when both servo motors are considered together there are a total of 16 states and up to 9 actions per state in the abstract interpretation of our domain.
+
+\end{document}

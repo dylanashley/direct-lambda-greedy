@@ -1,0 +1,11 @@
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+
+While the above experiments are performed on a robot, we note that our abstraction renders the domain the learning algorithms operate on somewhat tabular. Experimenting with these ideas on a more complicated system is essential to determine if the observations made here generalize. The need for a more complicated system also applies to the horde of value functions we use. The horde we use only consists of a few value functions making predictions about four signals. Previous incarnations of the horde architecture have made vastly more predictions \cite{sutton2011horde}. So one essential extension to the experiments in this paper would be extending the number and variety of value functions used in the horde.
+
+In addition to the lack of diversity in the horde, we also note that we somewhat limit both the direct and indirect versions of the {$\lambda$}-greedy algorithm by not exploring more parameter settings. To be exact, we do not consider inconsistent step sizes between the {$\lambda$}-greedy specific portion of the learning and the rest of the learning. Furthermore, the {$\lambda$}-greedy algorithm implicitly uses a $\lambda$ of one for the traces within the {$\lambda$}-greedy specific portion of the learning. This is necessary to produce an unbiased estimator \cite{white2016greedy}. However, more work should be done to determine if using a biased estimator would produce different results.
+
+In addition to a better exploration of parameter settings, we additionally note that, because of time constraints, we only consider the outcome of ten runs. If all of the above is implemented, it would be desirable to have many more runs to provide strong statistical significance.
+
+\end{document}

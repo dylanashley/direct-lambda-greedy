@@ -1,0 +1,49 @@
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+
+We compare the GTD($\lambda$) algorithm by \citep{sutton2009fast} and the {$\lambda$}-greedy from \citep{white2016greedy}. The {$\lambda$}-greedy algorithm uses an estimate of the variance of the return to select a value for $\lambda$ at each timestep. Recently a new method for estimating the variance of the return has emerged that has been shown to be more robust in some cases \cite{sherstan2018directly}. We include a version of {$\lambda$}-greedy that uses this new estimator in our analysis. From here on we refer to the original {$\lambda$}-greedy algorithm as {$\lambda$}-greedy and the modified version as direct {$\lambda$}-greedy. For both, we only consider the case where they are used with GTD($\lambda$). The pseudocode for direct {$\lambda$}-greedy appears in Algorithm~\ref{alg:direct}.
+
+\begin{algorithm}[tb]
+    \begin{algorithmic}
+        \STATE observe $\vec{x}_0$
+        \STATE $\vec{w} \leftarrow \vec{0}$
+        \STATE $\vec{h} \leftarrow \vec{0}$
+        \STATE $\vec{z} \leftarrow \vec{x}_0$
+        \STATE // initialize $\lambda$-greedy
+        \STATE $\vec{w}^{err} \leftarrow G_{max} \times \vec{1}$
+        \STATE $\vec{w}^{var} \leftarrow \vec{1}$
+        \STATE $\vec{z}^{err} \leftarrow \vec{x}_0$
+        \STATE $\vec{z}^{var} \leftarrow \vec{x}_0$
+        \REPEAT
+            \STATE take action $a_t$, observe $\vec{x}_{t + 1}$ and $r_{t + 1}$
+            \STATE $\rho_t = \pi(s_t, a_t) / \mu(s_t, a_t)$
+            \STATE // update $\vec{w}^{err}$
+            \STATE $g^{err} \leftarrow \vec{x}_{t + 1}^{\top} \vec{w}^{err}$
+            \STATE $\delta^{err} \leftarrow r_{t + 1} + \gamma_{t + 1} g^{err} - \vec{x}_t^{\top} \vec{w}^{err}$
+            \STATE $\vec{z}^{err} \leftarrow \rho_t \vec{z}^{err}$
+            \STATE $\vec{w}^{err} \leftarrow \vec{w}^{err} + \alpha_{t + 1} \delta^{err} \vec{z}^{err}$
+            \STATE $\vec{z}^{err} \leftarrow \gamma_{t + 1} \vec{z}^{err} + \vec{x}_{t + 1}$
+            \STATE // update $\vec{w}^{var}$
+            \STATE $r^{var} \leftarrow (\rho_t \delta^{err} - (\rho_t - 1) \vec{x}_t^{\top} \vec{w}^{err})^2$
+            \STATE $\gamma^{var} \leftarrow (\rho_t \gamma_{t + 1})^2$
+            \STATE $\delta^{var} \leftarrow r^{var} + \gamma^{var} \vec{x}_{t + 1}^{\top} \vec{w}^{var} - \vec{x}_t^{\top} \vec{w}^{var}$
+            \STATE $\vec{w}^{var} \leftarrow \vec{w}^{var} + \alpha_{t + 1} \delta^{var} \vec{z}^{var}$
+            \STATE $\vec{z}^{var} \leftarrow \gamma^{var} \vec{z}^{var} + \vec{x}_{t + 1}$
+            \STATE // compute $\lambda$ estimate
+            \STATE $\text{errsq} \leftarrow (g^{err} - \vec{x}_{t + 1}^{\top} \vec{w})^2$
+            \STATE $\text{varg} \leftarrow \max(0, \vec{x}_{t + 1}^{\top} \vec{w}^{var})$
+            \STATE $\lambda \leftarrow \text{errsq} / (\text{varg} + \text{errsq})$
+            \STATE // update $\vec{w}$
+            \STATE $\delta \leftarrow r_{t + 1} + \gamma_{t + 1} \vec{x}_{t + 1}^{\top} \vec{w} - \vec{x}_t^{\top} \vec{w}$
+            \STATE $\vec{z} \leftarrow \rho_t \vec{z}$
+            \STATE $\vec{w} \leftarrow \vec{w} + \alpha_{t + 1} (\delta \vec{z} - \gamma_{t + 1} (1 - \lambda) \vec{x}_{t + 1}) (\vec{z}^{\top} \vec{h})$
+            \STATE $\vec{h} \leftarrow \vec{h} + \alpha_{t + 1} \eta_{t + 1} (\delta \vec{z} - (\vec{h}^{\top} \vec{x}_t) \vec{x}_t)$
+            \STATE $\vec{z} \leftarrow \gamma_{t + 1} \lambda \vec{z} + \vec{x}_{t + 1}$
+        \UNTIL{done}
+    \end{algorithmic}
+    \caption{Policy evaluation using direct $\lambda$-greedy}
+    \label{alg:direct}
+\end{algorithm}
+
+\end{document}

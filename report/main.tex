@@ -1,0 +1,108 @@
+\documentclass[english]{article}
+
+% import packages
+\usepackage{substitutefont} % must be above babel
+\usepackage{babel} % babel must be above all other packages
+\usepackage[fleqn]{amsmath}
+\usepackage[iso]{isodate}
+\usepackage[labelfont=bf]{caption}
+\usepackage[utf8]{inputenc}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{alltt}
+\usepackage{amsthm, amssymb, bm, bbm}
+\usepackage{array}
+\usepackage{color}
+\usepackage{comment}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{minted}
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage{natbib}
+\usepackage{parskip}
+\usepackage{placeins}
+\usepackage{ragged2e}
+\usepackage{subfigure}
+\usepackage{subfiles}
+\usepackage{times}
+\usepackage{csquotes} % must appear after some package above
+
+% configure image file extensions
+\DeclareGraphicsExtensions{.pdf, .png, .jpg}
+\graphicspath{{images/}{../images/}}
+
+% fix hyperref and algorithmic packages
+\newcommand{\theHalgorithm}{\arabic{algorithm}}
+\renewcommand{\vec}{\mathbf}
+
+% use conference package
+\usepackage[accepted]{icml2017}
+
+% set running title
+\icmltitlerunning{Automatic Bootstrapping on a Vast Predictive Network}
+
+\begin{document}
+
+\twocolumn[
+\icmltitle{Automatic Bootstrapping on a Vast Predictive Network of Reinforcement Learning Sub-agents}
+
+\icmlsetsymbol{equal}{*}
+
+\begin{icmlauthorlist}
+    \icmlauthor{Dylan R. Ashley}{ua}
+\end{icmlauthorlist}
+
+\icmlaffiliation{ua}{University of Alberta, Edmonton, Alberta, Canada}
+
+\icmlcorrespondingauthor{Dylan R. Ashley}{dashley@ualberta.ca}
+
+\vskip 0.3in
+]
+
+\printAffiliationsAndNotice{}
+
+\begin{abstract}
+    We experiment with using the {$\lambda$}-greedy algorithm to simplify the task of tuning the trace-decay parameter on a vast network of temporal difference learning sub-agents, a problem that currently limits the utility of such networks. We find that {$\lambda$}-greedy can achieve good performance on our network. We also extend {$\lambda$}-greedy by using a recent, robust method of estimating the variance of the return. We find that this new variant has more stability in the $\lambda$ values selected from timestep to timestep but at the cost of decreased performance.
+\end{abstract}
+
+\section{Introduction}
+\label{sec:introduction}
+\subfile{sections/introduction}
+
+\section{Algorithms}
+\label{sec:algorithms}
+\subfile{sections/algorithms}
+
+\section{Robot}
+\label{sec:robot}
+\subfile{sections/robot}
+
+\section{Domain}
+\label{sec:domain}
+\subfile{sections/domain}
+
+\section{Value Functions}
+\label{sec:value_functions}
+\subfile{sections/value_functions}
+
+\section{Results}
+\label{sec:results}
+\subfile{sections/results}
+
+\section{Conclusion}
+\label{sec:conclusion}
+\subfile{sections/conclusion}
+
+\section{Future Work}
+\label{sec:future_work}
+\subfile{sections/future_work}
+
+\FloatBarrier
+
+\pagebreak
+
+\bibliographystyle{apa}
+\bibliography{main.bib}
+
+\end{document}

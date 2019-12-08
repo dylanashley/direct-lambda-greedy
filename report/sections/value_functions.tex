@@ -1,0 +1,43 @@
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+
+We implement twenty-two general value functions with a total of seven different cumulants, eight different termination functions, and five different policies. Many of these general value functions correspond to only one leg. For these cases, we define one such general value function for each leg. However, for simplicity, we do not discuss general value functions that only correspond to the second leg. The results and discussion of the results regarding value functions that correspond to only the first leg can be considered representative of the second leg.
+
+\subsection{On-policy}
+\label{sec:on-policy}
+
+For our behavior policy, we use a random walk. Meaning that, for each leg and for each state as described in Section~\ref{sec:domain}, the agent will select an action at random from the set of available action in that state. We define a total of fourteen on-policy general value functions. These value functions can be described as follows:
+
+\begin{description}
+    \item[Leg 1 Parallel] how many steps before the first leg is parallel to the body
+    \item[Both Legs Parallel] how many steps before both legs are parallel to the body
+    \item[Leg 1 Perpendicular] how many steps before the first leg is perpendicular to the body
+    \item[Both Legs Perpendicular] how many steps before both legs are perpendicular to the body
+    \item[1-Step Leg 1 Distance] what will be the absolute value of the distance traveled by the first leg within one step
+    \item[8-Step Leg 1 Distance] what will be the absolute value of the distance traveled by the first leg over the next eight timesteps
+    \item[1-Step Leg 1 Position] what will be the position of the first leg in one step
+    \item[1-Step Leg 1 Load] what will be the load on the first leg in one step
+\end{description}
+
+For the first four value functions, the cumulant is defined to be always one. All of them use a state-dependent termination function that is one while the leg(s) are not in the desired position and zero when they are. The following two value functions have a cumulant equal to the absolute value of the displacement of the leg in one step and a termination function that is, respectively, $0$ and $0.875$ for all states. The final two have cumulants equal to the position of the leg in the next step and the load of the leg in the next step. Both have a termination function that is zero for all states.
+
+For all the value functions not involving the load, the true value function can be derived. As we wish to evaluate the performance of the various algorithms we compare, we derive the true value for these value functions. We additionally derive the maximum value of the return for each value function so that we can initialize the $\lambda$-greedy algorithm correctly. However, for the first four value functions above the true maximum return is infinite. For these value functions, we use 1500 as an estimate of the maximum value of the return. We find that a return of this magnitude is unlikely to be encountered but using such a value as initialization for the $\lambda$-greedy algorithm does not significantly hamper the ability of the algorithm to learn. Note that the maximum value of the load is defined by the specifications of the servos. For the servos, the maximum load that can be communicated is 511.
+
+\subsection{Off-policy}
+\label{sec:off-policy}
+
+We define a total of eight off-policy \cite{sutton1998reinforcement} general value functions. These value functions are described as follows:
+
+\begin{description}
+    \item[Fastest Leg 1 Parallel] under the minimizing policy how many steps before the first leg is parallel to the body
+    \item[Fastest Leg 1 Perpendicular] under the minimizing policy how many steps before the first leg is perpendicular to the body
+    \item[1-Step Leg 1 Down Position] if the robot moves the first leg down, what will be the position of the leg in the next step
+    \item[1-Step Leg 1 Down Load] if the robot moves the first leg down, what will be the load on the leg in the next step
+\end{description}
+
+The policies for the above value functions are self-explanatory from the description and looking at the abstraction in Section~\ref{sec:domain}. In total, the aforementioned value functions define two target policies and two additional target policies when the equivalent value functions for the other leg are considered. Apart from the target policy, the definition of the above value functions are the same as their on-policy equivalents described in Section~\ref{sec:on-policy}.
+
+As with the on-policy case, we derive both the true value for each off-policy value function not involving the load, and we derive the maximum return for all off-policy value functions.
+
+\end{document}
